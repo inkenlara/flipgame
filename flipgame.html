@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Color Flip</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        class Board {
+            constructor(n) {
+                this.n = n;
+                this.board = new Array(n).fill().map(() => new Array(n).fill(false));
+                this.initUI();
+            }
+
+            initUI() {
+                this.$board = $('<div>').attr('id', 'board');
+                $('body').append(this.$board);
+
+                // Create buttons for each field
+                this.buttons = [];
+                for (let i = 0; i < this.n; i++) {
+                    let row = [];
+                    for (let j = 0; j < this.n; j++) {
+                        let $button = $('<button>').appendTo(this.$board);
+                        $button.css({
+                            top: 50*i,
+                            left: 50*j,
+                            width: 50,
+                            height: 50,
+                            backgroundColor: 'white',
+                        });
+                        $button.click(() => this.click(i, j));
+                        row.push($button);
+                    }
+                    this.buttons.push(row);
+                }
+            }
+
+            click(i, j) {
+                // Flip the color of the clicked button
+                this.board[i][j] = !this.board[i][j];
+                let color = this.board[i][j] ? 'black' : 'white';
+                this.buttons[i][j].css('backgroundColor', color);
+
+                // Flip the colors of the buttons in the same row and column
+                for (let k = 0; k < this.n; k++) {
+                    if (k !== i) {
+                        this.board[k][j] = !this.board[k][j];
+                        let color = this.board[k][j] ? 'black' : 'white';
+                        this.buttons[k][j].css('backgroundColor', color);
+                    }
+                    if (k !== j) {
+                        this.board[i][k] = !this.board[i][k];
+                        let color = this.board[i][k] ? 'black' : 'white';
+                        this.buttons[i][k].css('backgroundColor', color);
+                    }
+                }
+
+                // Check if the game is finished
+                if (this.board.every(row => row.every(cell => cell))) {
+                    this.finished();
+                }
+            }
+
+            finished() {
+                // Draw a message on the board indicating that the game is finished
+                let $message = $('<div>').addClass('message').text('You win!');
+                this.$board.append($message);
+            }
+        }
+
+        $(document).ready(() => {
+            let size = parseInt(prompt('Enter board size:'));
+            let board = new Board(size);
+        });
+    </script>
+    <style>
+        #board {
+            position: relative;
+        }
+
+        button {
+            position: absolute;
+            border: 2px solid green;
+        }
+
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <h1>Color Flip</h1>
+</body>
+</html>
